@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  %_complete: 1
+  end_date: 2021-07-26
+
+two:
+  %_complete: 1
+  end_date: 2021-07-26
