@@ -55,5 +55,8 @@ end
 3.times do
 	group_name = ["Xuhui's Finest", "Shanghai"]
 	group = Group.new(
-		name: 
+		name: group_name.sample
 		)
+	group.save!
+	puts "Group: #{group.name} created!"
+end
