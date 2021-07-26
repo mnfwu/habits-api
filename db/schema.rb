@@ -53,7 +53,7 @@ ActiveRecord::Schema.define(version: 2021_07_26_033632) do
   create_table "steps", force: :cascade do |t|
     t.bigint "habit_id", null: false
     t.string "name"
-    t.string "type"
+    t.string "step_type"
     t.boolean "completed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

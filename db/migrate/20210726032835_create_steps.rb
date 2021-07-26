@@ -3,7 +3,7 @@ class CreateSteps < ActiveRecord::Migration[6.0]
     create_table :steps do |t|
       t.references :habit, null: false, foreign_key: true
       t.string :name
-      t.string :type
+      t.string :step_type
       t.boolean :completed
 
       t.timestamps
