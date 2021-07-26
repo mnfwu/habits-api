@@ -28,14 +28,14 @@ class Api::V1::StepsController < Api::V1::BaseController
     @step.destroy
   end
 
-  def show_user_steps
+  def show_habit_steps
     @steps = Step.where("habit_id = #{params[:habit_id]}")
   end
 
   private
 
   def step_params
-    params.require(:step).permit(:name, :type, :completed, :habit_id)
+    params.require(:step).permit(:name, :step_type, :completed, :habit_id)
   end
 
   def find_step
