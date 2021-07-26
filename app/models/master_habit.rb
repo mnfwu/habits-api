@@ -1,4 +1,6 @@
 class MasterHabit < ApplicationRecord
 	belongs_to :user
-	serialize :frequency_options, Array
+	validates :name, presence: true
+	validates :frequency_options, presence: true
+	validates :start_date, presence: true
 end
