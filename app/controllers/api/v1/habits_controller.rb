@@ -28,7 +28,7 @@ class Api::V1::HabitsController < Api::V1::BaseController
     @habit.destroy
   end
 
-  def show_user_habits
+  def show_master_habit_habits
     @habits = Habit.where("master_habit_id = #{params[:master_habit_id]}")
   end
 
