@@ -1,4 +1,4 @@
-class Api::V1::StepsController < Api::V1::BaseController
+class Api::V1::GroupsController < Api::V1::BaseController
   before_action :find_group, only: %i[show update destroy]
 
   def index
