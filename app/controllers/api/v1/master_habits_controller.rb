@@ -35,10 +35,15 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   private
 
   def master_habit_params
-    params.require(:master_habit).permit(:name, :frequency_options, :start_date, :end_date, :user_id)
+    params.require(:master_habit).permit(:name, :start_date, :end_date, :user_id, :frequency_options => [])
   end
 
   def find_master_habit
     @master_habit = MasterHabit.find(params[:id])
+  end
+
+  def render_error
+    render json: { errors: @story.errors.full_messages },
+      status: :unprocessable_entity
   end
 end

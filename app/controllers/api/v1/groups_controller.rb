@@ -42,4 +42,9 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def find_group
     @group = Group.find(params[:id])
   end
+
+  def render_error
+    render json: { errors: @story.errors.full_messages },
+      status: :unprocessable_entity
+  end
 end
