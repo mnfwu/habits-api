@@ -12,7 +12,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def create
     @master_habit = MasterHabit.new(master_habit_params)
     if @master_habit.save
-      create_steps
+      # create_steps
       render json: @master_habit
     else
       render_error
@@ -30,11 +30,11 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     end
   end
 
-  def create_steps
-    params[:step_array].each do |step|
-      puts step["name"]
-    end
-  end
+  # def create_steps
+  #   params[:step_array].each do |step|
+  #     puts step["name"]
+  #   end
+  # end
 
 
   def destroy
