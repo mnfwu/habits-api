@@ -7,8 +7,9 @@ Rails.application.routes.draw do
         end
       end
       get '/users/:user_id/master_habits', to: 'master_habits#show_user_master_habits', as: 'show_user_master_habits'
-      get '/master_habits/:master_habit_id/allhabits', to: 'habits#show_master_habit_habits', as: 'show_master_habit_habits'
-      get '/habits/:habit_id/steps', to: 'steps#show_habit_steps', as: 'show_habit_steps'
+      # get '/master_habits/:master_habit_id/allhabits', to: 'habits#show_master_habit_habits', as: 'show_master_habit_habits'
+      # get '/habits/:habit_id/steps', to: 'steps#show_habit_steps', as: 'show_habit_steps'
+      #last two can be simplified into 'show' views on master habits and habits
     end
   end
 end
