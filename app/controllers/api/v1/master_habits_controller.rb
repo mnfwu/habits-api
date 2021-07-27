@@ -1,6 +1,8 @@
 class Api::V1::MasterHabitsController < Api::V1::BaseController
   before_action :find_master_habit, only: %i[show update destroy]
 
+
+
   def index
     @master_habits = MasterHabit.all
   end
@@ -10,10 +12,14 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def create
     @master_habit = MasterHabit.new(master_habit_params)
     if @master_habit.save
+      create_steps
       render json: @master_habit
     else
       render_error
     end
+    # frequency logic
+    # create habit based on frequency
+    # create steps based on frequency
   end
 
   def update
@@ -23,6 +29,13 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       render_error
     end
   end
+
+  def create_steps
+    params[:step_array].each do |step|
+      puts step["name"]
+    end
+  end
+
 
   def destroy
     @master_habit.destroy
