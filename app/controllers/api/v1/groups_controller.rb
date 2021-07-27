@@ -29,8 +29,8 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def show_user_groups
-    # This needs to be updated to reflect that group is connected to users throgh usersgroups
-    @groups = Group.where("user_id = #{params[:user_id]}")
+    user = User.find(params[:user_id])
+    @groups = user.groups
   end
 
   private
