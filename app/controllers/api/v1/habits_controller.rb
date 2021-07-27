@@ -41,4 +41,9 @@ class Api::V1::HabitsController < Api::V1::BaseController
   def find_habit
     @habit = Habit.find(params[:id])
   end
+
+  def render_error
+    render json: { errors: @story.errors.full_messages },
+      status: :unprocessable_entity
+  end
 end
