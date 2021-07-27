@@ -1,6 +1,13 @@
-json.master_habits do
-  json.array! @master_habits do |master_habit|
-    json.extract! master_habit, :name, :frequency_options, :start_date, :end_date, :user_id
-    json.user User.find(master_habit.user_id)
-  end
-end
+@user = User.find(@master_habits.first.user_id)
+json.user @user
+json.master_habits @master_habits
+json.groups @user.groups
+
+# @goals = []
+# @user.groups do |group|
+#   @goal = Goal.where("group_id = #{group.id}")
+#   @goals << @goal
+# end
+
+# json.goals @goals
+# # @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
