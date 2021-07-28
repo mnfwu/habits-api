@@ -20,9 +20,9 @@ class Api::V1::LoginController < Api::V1::BaseController
       js_code: params[:code],
       grant_type: 'authorization_code'
     }
-    # p "wechat_params: #{wechat_params}"
+    p "wechat_params: #{wechat_params}"
     wechat_response = RestClient.get(URL, params: wechat_params)
-    # p "wechat_response: #{wechat_response}"
+    p "wechat_response: #{wechat_response}"
     JSON.parse(wechat_response.body)
   end
 end
