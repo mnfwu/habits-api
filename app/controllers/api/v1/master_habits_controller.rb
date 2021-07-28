@@ -10,7 +10,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def create
     @master_habit = MasterHabit.new(master_habit_params)
     if @master_habit.save
-      logic_route(@master_habit)
+      frequency_logic(@master_habit)
       render json: @master_habit
     else
       render_error
@@ -49,21 +49,53 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       status: :unprocessable_entity
   end
 
-  def logic_route(master_habit)
-    case master_habit.frequency_options[0]
+  def frequency_logic(m)
+    case m.frequency_options[0]
     when "Daily"
-      generate_daily_habits(master_habit)
+      generate_daily_habits(m)
     when "Weekly"
-      @frequency = times_per_week
+      puts "hi"
     else
-      @frequency = specific_days
+      all_dates = find_specific_days(m)
+      generate_weekly_habits_days(all_dates, m)
     end
   end
 
-#different kinds of frequency functions
-  def daily(master_habit)
-    return (master_habit.end_date - master_habit.start_date).to_i + 1
-    # need to code in logic based on day of the week
+  def find_specific_days(m)
+    final_dates = []
+    datesByWeekday = (m.start_date..m.end_date).group_by(&:wday)
+    m.frequency_options.each do |day|
+      case day
+      when "Monday"
+        final_dates += datesByWeekday[1]
+      when "Tuesday"
+        final_dates += datesByWeekday[2]
+      when "Wednesday"
+        final_dates += datesByWeekday[3]
+      when "Thursday"
+        final_dates += datesByWeekday[4]
+      when "Friday"
+        final_dates += datesByWeekday[5]
+      when "Saturday"
+        final_dates += datesByWeekday[6]
+      when "Sunday"
+        final_dates += datesByWeekday[0]
+      end
+    end
+    return final_dates
+  end
+
+
+  def generate_weekly_habits_days(dates, m)
+    dates.each do |date|
+      @habit = Habit.new(master_habit_id: m.id, due_date: date)
+      @habit.save!
+      create_steps
+      @steps.each do |step|
+        step.habit_id = @habit.id
+        step.save!
+      end
+    end
   end
 
   def times_per_week
@@ -84,17 +116,14 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     # need to code in logic based on day of the week
   end
 
-  def specific_days
-    return @master_habit.frequency_options.length
-    datesByWeekday = (start_date..end_date).group_by(&:wday)
-    datesByWeekday[0]
+  def generate_weekly_habits_times(master_habit)
   end
 
-  def generate_daily_habits(master_habit)
-    @date = master_habit.start_date
-    @frequency = (master_habit.end_date - master_habit.start_date).to_i + 1
+  def generate_daily_habits(m)
+    @date = m.start_date
+    @frequency = (m.end_date - m.start_date).to_i + 1
     @frequency.times do
-        @habit = Habit.new(master_habit_id: master_habit.id, due_date: @date)
+        @habit = Habit.new(master_habit_id: m.id, due_date: @date)
         @habit.save!
         create_steps
         @steps.each do |step|
