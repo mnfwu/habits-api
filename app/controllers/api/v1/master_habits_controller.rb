@@ -19,6 +19,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def update
     if @master_habit.update(master_habit_params)
+      #once a master habit is updated, destroy all instances of future habits and redo logic_route
       render json: @master_habit
     else
       render_error
@@ -51,18 +52,17 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def logic_route(master_habit)
     case master_habit.frequency_options[0]
     when "Daily"
-      @frequency = daily
+      generate_daily_habits(master_habit)
     when "Weekly"
       @frequency = times_per_week
     else
       @frequency = specific_days
     end
-    generate_habit_instances(@frequency, master_habit)
   end
 
 #different kinds of frequency functions
-  def daily
-    return 7
+  def daily(master_habit)
+    return (master_habit.end_date - master_habit.start_date).to_i + 1
     # need to code in logic based on day of the week
   end
 
@@ -86,17 +86,22 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def specific_days
     return @master_habit.frequency_options.length
+    datesByWeekday = (start_date..end_date).group_by(&:wday)
+    datesByWeekday[0]
   end
 
-  def generate_habit_instances(frequency, master_habit)
-    frequency.times do
-      @habit = Habit.new(master_habit_id: master_habit.id)
-      @habit.save!
-      create_steps
-      @steps.each do |step|
-        step.habit_id = @habit.id
-        step.save!
-      end
+  def generate_daily_habits(master_habit)
+    @date = master_habit.start_date
+    @frequency = (master_habit.end_date - master_habit.start_date).to_i + 1
+    @frequency.times do
+        @habit = Habit.new(master_habit_id: master_habit.id, due_date: @date)
+        @habit.save!
+        create_steps
+        @steps.each do |step|
+          step.habit_id = @habit.id
+          step.save!
+        end
+        @date += 1
     end
   end
 
