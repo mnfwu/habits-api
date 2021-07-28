@@ -110,24 +110,6 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     end
   end
 
-  def times_per_week
-    case @master_habit.frequency_options[1]
-    when "One"
-      return 1
-    when "Two"
-      return 2
-    when "Three"
-      return 3
-    when "Four"
-      return 4
-    when "Five"
-      return 5
-    else
-      return 6
-    end
-    # need to code in logic based on day of the week
-  end
-
   def generate_daily_habits(m)
     @date = m.start_date
     @frequency = (m.end_date - m.start_date).to_i + 1
