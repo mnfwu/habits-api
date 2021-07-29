@@ -10,7 +10,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def create
     @master_habit = MasterHabit.new(master_habit_params)
     if @master_habit.save
-      frequency_logic(@master_habit)
+      new_frequency_logic(@master_habit)
       render json: @master_habit
     else
       render_error
@@ -19,7 +19,8 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def update
     if @master_habit.update(master_habit_params)
-      #once a master habit is updated, destroy all instances of future habits and redo logic_route
+      delete_habits(@master_habit)
+      update_frequency_logic(@master_habit)
       render json: @master_habit
     else
       render_error
@@ -49,36 +50,61 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       status: :unprocessable_entity
   end
 
-  def frequency_logic(m)
+###################### Generating a new master_habit route ######################
+  def new_frequency_logic(m)
     case m.frequency_options[0]
     when "Daily"
-      generate_daily_habits(m)
+      generate_daily_habits(m, m.start_date)
     when "Weekly"
-      all_dates = find_times(m)
-      generate_weekly_habits(all_dates, m)
+      all_dates = find_times(m, m.start_date)
+      generate_weekly_habits(m, all_dates)
     else
-      all_dates = find_specific_days(m)
-      generate_weekly_habits(all_dates, m)
+      all_dates = find_specific_days(m, m.start_date)
+      generate_weekly_habits(m, all_dates)
     end
   end
 
-  def find_specific_days(m)
+###################### Updating a new master_habit route ######################
+  def delete_habits(m)
+    habits = m.habits.where("due_date >= '#{Date.today}'")
+    habits.destroy_all
+    m.save
+  end
+
+  def update_frequency_logic(m)
+    m.start_date < Date.today ? @date = Date.today : @date = m.start_date
+    case m.frequency_options[0]
+    when "Daily"
+      generate_daily_habits(m, @date)
+    when "Weekly"
+      all_dates = find_times(m, @date)
+      generate_weekly_habits(m, all_dates)
+    else
+      puts "specific days"
+      all_dates = find_specific_days(m, @date)
+      generate_weekly_habits(m, all_dates)
+    end
+  end
+
+###################### Find days and generate habits ######################
+
+  def find_specific_days(m, date)
     final_dates = []
     weekdays = {
       "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5,
       "Saturday": 6, "Sunday": 0
     }
-    datesByWeekday = (m.start_date..m.end_date).group_by(&:wday)
+    datesByWeekday = (date..m.end_date).group_by(&:wday)
     m.frequency_options.each do |day|
       final_dates += datesByWeekday[weekdays[day.to_sym]]
     end
     return final_dates.sort!
   end
 
-  def find_times(m)
+  def find_times(m, date)
     final_dates = []
     times = m.frequency_options[1].to_i
-    datesByWeekday = (m.start_date..m.end_date).group_by(&:wday)
+    datesByWeekday = (date..m.end_date).group_by(&:wday)
     days = [0, 6, 5, 4, 3, 2]
     days[0..(times - 1)].each do |i|
       final_dates += datesByWeekday[i]
@@ -87,7 +113,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   end
 
 
-  def generate_weekly_habits(dates, m)
+  def generate_weekly_habits(m, dates)
     dates.each do |date|
       create_steps
       @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, frequency_options: m.frequency_options, total_steps: @steps.length)
@@ -99,8 +125,8 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     end
   end
 
-  def generate_daily_habits(m)
-    @date = m.start_date
+  def generate_daily_habits(m, date)
+    @date = date
     @frequency = (m.end_date - m.start_date).to_i + 1
     @frequency.times do
         create_steps
