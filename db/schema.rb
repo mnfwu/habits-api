@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_29_031111) do
+ActiveRecord::Schema.define(version: 2021_07_29_054117) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,8 +37,8 @@ ActiveRecord::Schema.define(version: 2021_07_29_031111) do
     t.datetime "updated_at", precision: 6, null: false
     t.date "due_date"
     t.date "completed_date"
-    t.boolean "completed_on_time?"
-    t.boolean "completed?"
+    t.boolean "completed_on_time"
+    t.boolean "completed"
     t.string "name"
     t.text "frequency_options", default: [], array: true
     t.integer "total_steps", default: 0

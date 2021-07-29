@@ -103,9 +103,9 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     @date = m.start_date
     @frequency = (m.end_date - m.start_date).to_i + 1
     @frequency.times do
-        @habit = Habit.new(master_habit_id: m.id, due_date: @date)
-        @habit.save!
         create_steps
+        @habit = Habit.new(master_habit_id: m.id, due_date: @date, name: m.name, frequency_options: m.frequency_options, total_steps: @steps.length)
+        @habit.save!
         @steps.each do |step|
           step.habit_id = @habit.id
           step.save!
