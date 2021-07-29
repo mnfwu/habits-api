@@ -1,5 +1,5 @@
 class Api::V1::StepsController < Api::V1::BaseController
-  before_action :find_step, only: %i[show destroy]
+  before_action :find_step, only: %i[update show destroy]
 
   def index
     @steps = Step.all
@@ -17,7 +17,6 @@ class Api::V1::StepsController < Api::V1::BaseController
   end
 
   def update
-    @step = Step.find(params[:step_id])
     if @step.update(step_params)
       render json: @step
     else
@@ -47,4 +46,13 @@ class Api::V1::StepsController < Api::V1::BaseController
     render json: { errors: @story.errors.full_messages },
       status: :unprocessable_entity
   end
+
+  #check if the params changed is the completed boolean
+  #find the habit instance associated with this step
+  #set the steps_completed integer
+  #check if steps_completed == total_steps
+  #change completed? boolean
+  #log completed date
+  #check if completed date <= due_date
+  #change completed_on_time boolean
 end
