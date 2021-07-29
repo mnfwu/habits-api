@@ -89,9 +89,9 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def generate_weekly_habits(dates, m)
     dates.each do |date|
-      @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, frequency_options: m.frequency_options)
-      @habit.save!
       create_steps
+      @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, frequency_options: m.frequency_options, total_steps: @steps.length)
+      @habit.save!
       @steps.each do |step|
         step.habit_id = @habit.id
         step.save!
