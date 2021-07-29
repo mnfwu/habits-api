@@ -64,26 +64,15 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def find_specific_days(m)
     final_dates = []
+    weekdays = {
+      "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5,
+      "Saturday": 6, "Sunday": 0
+    }
     datesByWeekday = (m.start_date..m.end_date).group_by(&:wday)
     m.frequency_options.each do |day|
-      case day
-      when "Monday"
-        final_dates += datesByWeekday[1]
-      when "Tuesday"
-        final_dates += datesByWeekday[2]
-      when "Wednesday"
-        final_dates += datesByWeekday[3]
-      when "Thursday"
-        final_dates += datesByWeekday[4]
-      when "Friday"
-        final_dates += datesByWeekday[5]
-      when "Saturday"
-        final_dates += datesByWeekday[6]
-      when "Sunday"
-        final_dates += datesByWeekday[0]
-      end
+      final_dates += datesByWeekday[weekdays[day.to_sym]]
     end
-    return final_dates
+    return final_dates.sort!
   end
 
   def find_times(m)
@@ -94,13 +83,13 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     days[0..(times - 1)].each do |i|
       final_dates += datesByWeekday[i]
     end
-    return final_dates
+    return final_dates.sort!
   end
 
 
   def generate_weekly_habits(dates, m)
     dates.each do |date|
-      @habit = Habit.new(master_habit_id: m.id, due_date: date)
+      @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, frequency_options: m.frequency_options)
       @habit.save!
       create_steps
       @steps.each do |step|
