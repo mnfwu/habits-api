@@ -19,6 +19,7 @@ class Api::V1::StepsController < Api::V1::BaseController
   def update
     if @step.update(step_params)
       find_habit(@step)
+      reorder_habits(@step)
       render json: @step
     else
       render_error
@@ -50,19 +51,23 @@ class Api::V1::StepsController < Api::V1::BaseController
 
   def find_habit(s)
     @habit = Habit.find(s.habit_id)
-    @habit.steps_completed = 3
+    @habit_completed_steps = @habit.steps.where("completed = true")
+    @habit.steps_completed = @habit_completed_steps.length
     if @habit.steps_completed == @habit.total_steps
-      puts @habit.completed?
+      @habit.completed = true
+      @habit.completed_date = Date.today
+    else
+      @habit.completed_date = nil
+      @habit.completed = nil
+      @habit.completed_on_time = nil
+    end
+    if @habit.completed_date?
+      @habit.completed_date <= @habit.due_date ? @habit.completed_on_time = true : @habit.completed_on_time = false
     end
     @habit.save!
   end
 
-  #check if the params changed is the completed boolean
-  #find the habit instance associated with this step
-  #set the steps_completed integer
-  #check if steps_completed == total_steps
-  #change completed? boolean
-  #log completed date
-  #check if completed date <= due_date
-  #change completed_on_time boolean
+  def reorder_habits(s)
+  end
+
 end
