@@ -35,7 +35,7 @@ class Api::V1::HabitsController < Api::V1::BaseController
   private
 
   def habit_params
-    params.require(:habit).permit(:partially_completed, :completed, :master_habit_id)
+    params.require(:habit).permit(:due_date, :steps_completed, :completed, :master_habit_id)
   end
 
   def find_habit
