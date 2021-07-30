@@ -18,7 +18,8 @@ class Api::V1::StepsController < Api::V1::BaseController
 
   def update
     if @step.update(step_params)
-      find_habit(@step)
+      check_habit(@step)
+      update_mh(@step)
       render json: @step
     else
       render_error
@@ -48,22 +49,34 @@ class Api::V1::StepsController < Api::V1::BaseController
       status: :unprocessable_entity
   end
 
-  def find_habit(s)
+  def check_habit(s)
     @habit = Habit.find(s.habit_id)
-    @habit_completed_steps = @habit.steps.where("completed = true")
-    @habit.steps_completed = @habit_completed_steps.length
+    @habit.steps_completed = @habit.steps.where("completed = true").length
     if @habit.steps_completed == @habit.total_steps
-      @habit.completed = true
-      @habit.completed_date = Date.today
-    else
-      @habit.completed_date = nil
-      @habit.completed = nil
-      @habit.completed_on_time = nil
+       @habit.completed = true
+       @habit.partially_completed = false
+       @habit.missed = false
     end
-    if @habit.completed_date?
-      @habit.completed_date <= @habit.due_date ? @habit.completed_on_time = true : @habit.completed_on_time = false
+    @date = Date.today
+    if @date > @habit.due_date
+      if @habit.steps_completed > 0 && @habit.steps_completed < @habit.total_steps
+        @habit.partially_completed = true
+        @habit.missed = false
+        @habit.completed = false
+      elsif @habit.steps_completed == 0
+        @habit.missed = true
+        @habit.partially_completed = false
+        @habit.completed = false
+      end
     end
     @habit.save!
   end
 
+  def update_mh(s)
+    @habits = Habit.where("week = #{@habit.week}")
+    @master_habit = MasterHabit.find(@habit.master_habit_id)
+    completed_rate = (@habits.where("completed = true").length / @habits.length.to_f) * 100
+    @master_habit.percent_complete = completed_rate
+    @master_habit.save!
+  end
 end
