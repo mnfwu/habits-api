@@ -35,6 +35,10 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
   end
 
+  def analytics
+    @habits = Habit.where("master_habit_id = #{params[:master_habit_id]}").order("week")
+  end
+
   private
 
   def master_habit_params
