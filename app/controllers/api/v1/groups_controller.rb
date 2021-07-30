@@ -10,6 +10,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def create
     @group = Group.new(group_params)
     if @group.save
+      create_user_group(@group)
       render json: @group
     else
       render_error
@@ -46,5 +47,11 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def render_error
     render json: { errors: @story.errors.full_messages },
       status: :unprocessable_entity
+  end
+
+  def create_user_group(g)
+    @user_id = params[:user_id].to_i
+    @user_group = UsersGroup.new(group_id: g.id, user_id: @user_id)
+    @user_group.save!
   end
 end
