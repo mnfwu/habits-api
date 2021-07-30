@@ -19,6 +19,7 @@ class Api::V1::StepsController < Api::V1::BaseController
   def update
     if @step.update(step_params)
       check_habit(@step)
+      update_habit_percentage(@step)
       update_mh(@step)
       render json: @step
     else
@@ -72,11 +73,22 @@ class Api::V1::StepsController < Api::V1::BaseController
     @habit.save!
   end
 
-  def update_mh(s)
-    @habits = Habit.where("week = #{@habit.week}")
+  def update_habit_percentage(s)
     @master_habit = MasterHabit.find(@habit.master_habit_id)
-    completed_rate = (@habits.where("completed = true").length / @habits.length.to_f) * 100
-    @master_habit.percent_complete = completed_rate
-    @master_habit.save!
+    @mh_habits = Habit.where("master_habit_id = #{@master_habit.id}")
+    @other_habits = @mh_habits.where("week = #{@habit.week}")
+    @completed_percentage = (@other_habits.where("completed = true").length / @other_habits.length.to_f) * 100
+    @other_habits.each do |habit|
+      habit.weekly_percent_complete = @completed_percentage
+      habit.save!
+    end
   end
+
+  def update_mh(s)
+    @habit = Habit.find(s.habit_id)
+    @mh = MasterHabit.find(@habit.master_habit_id)
+    @mh.percent_complete = @habit.weekly_percent_complete
+    @mh.save!
+  end
+
 end
