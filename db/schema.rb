@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_29_054117) do
+ActiveRecord::Schema.define(version: 2021_07_30_025508) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,6 +42,9 @@ ActiveRecord::Schema.define(version: 2021_07_29_054117) do
     t.string "name"
     t.text "frequency_options", default: [], array: true
     t.integer "total_steps", default: 0
+    t.integer "week"
+    t.boolean "missed"
+    t.boolean "partially_completed"
     t.index ["master_habit_id"], name: "index_habits_on_master_habit_id"
   end
 
