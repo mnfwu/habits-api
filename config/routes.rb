@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       get '/users/:user_id/master_habits', to: 'master_habits#show_user_master_habits', as: 'show_user_master_habits'
       post '/login', to: 'login#login'
       put '/steps/:id', to: 'steps#update'
+      post '/groups/:group_id', to: 'groups#add_user_to_group'
       get 'master_habits/:master_habit_id/analytics', to: 'master_habits#analytics'
     end
   end
