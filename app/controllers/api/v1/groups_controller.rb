@@ -34,6 +34,13 @@ class Api::V1::GroupsController < Api::V1::BaseController
     @groups = user.groups
   end
 
+  def add_user_to_group
+    user_id = params[:user_id].to_i
+    group_id = params[:group_id].to_i
+    user_group = UsersGroup.new(group_id: group_id, user_id: user_id)
+    user_group.save!
+  end
+
   private
 
   def group_params
