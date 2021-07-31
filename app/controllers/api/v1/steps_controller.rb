@@ -18,8 +18,9 @@ class Api::V1::StepsController < Api::V1::BaseController
 
   def update
     if @step.update(step_params)
-      check_habit(@step)
-      update_mh(@step)
+      @habit = Habit.find(@step.habit_id)
+      update_habit(@habit)
+      update_mh(@habit)
       render json: @step
     else
       render_error
@@ -49,38 +50,44 @@ class Api::V1::StepsController < Api::V1::BaseController
       status: :unprocessable_entity
   end
 
-  def check_habit(s)
-    @habit = Habit.find(s.habit_id)
-    @habit.steps_completed = @habit.steps.where("completed = true").length
-    if @habit.steps_completed == @habit.total_steps
-       @habit.completed = true
-       @habit.partially_completed = false
-       @habit.missed = false
-    end
-    @date = Date.today
-    if @date > @habit.due_date
-      if @habit.steps_completed > 0 && @habit.steps_completed < @habit.total_steps
-        @habit.partially_completed = true
-        @habit.missed = false
-        @habit.completed = false
-      elsif @habit.steps_completed == 0
-        @habit.missed = true
-        @habit.partially_completed = false
-        @habit.completed = false
-      end
-    end
-    @habit.save!
+### finds habit and runs logic if its completed, partially completed, or missed.
+  def update_habit(h)
+    h.steps_completed = h.steps.where("completed = true").length
+    h.save!
   end
 
-  def update_mh(s)
-    @master_habit = MasterHabit.find(@habit.master_habit_id)
-    @habits = Habit.where("master_habit_id = #{@master_habit.id}").where("week = #{@habit.week}")
-    completed_rate = (@habits.where("completed = true").length / @habits.length.to_f) * 100
-    @habits.each do |habit| 
-      habit.weekly_percent_complete = completed_rate 
+  def update_mh(h)
+    master_habit = MasterHabit.find(h.master_habit_id)
+    habits = Habit.where("master_habit_id = #{master_habit.id}").where("week = #{h.week}")
+    completed_rate = (habits.where("completed = true").length / habits.length.to_f) * 100
+    habits.each do |habit| 
+      habit.weekly_percent_complete = completed_rate
+      check_habit(habit)
       habit.save!
     end
-    @master_habit.percent_complete = completed_rate
-    @master_habit.save!
+    master_habit.percent_complete = completed_rate
+    master_habit.save!
   end
+
+  def check_habit(h)
+    if h.steps_completed == h.total_steps
+       h.completed = true
+       h.partially_completed = false
+       h.missed = false
+    end
+    date = Date.today
+    if date > h.due_date
+      if h.steps_completed > 0 && h.steps_completed < h.total_steps
+        h.partially_completed = true
+        h.missed = false
+        h.completed = false
+      elsif h.steps_completed == 0
+        h.missed = true
+        h.partially_completed = false
+        h.completed = false
+      end
+    end
+    h.save!
+  end
+
 end
