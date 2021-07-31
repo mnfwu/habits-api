@@ -35,6 +35,23 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
   end
 
+  def analytics
+    @habits = Habit.where("master_habit_id = #{params[:master_habit_id]}").order("due_date")
+    @habit_weeks = @habits.map { |habit| habit.week }.uniq!
+    i = 1
+    @weeks = []
+    date = Date.today
+    @habit_weeks.each do |week|
+      week_stats = []
+      week_habits = @habits.where("week = #{week}")
+      week_stats << "Week #{i}: #{week_habits.first.due_date.beginning_of_week} to #{week_habits.first.due_date.end_of_week}"
+      week_stats << (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "Percent Complete: #{week_habits.first.weekly_percent_complete || 0}%")
+      week_stats << week_habits
+      @weeks << week_stats
+      i += 1
+    end
+  end
+
   private
 
   def master_habit_params
