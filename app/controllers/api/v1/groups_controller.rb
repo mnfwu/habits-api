@@ -42,7 +42,10 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def add_new_goal
-    @goal = Goal.new(goal_params)
+    @goal = Goal.new
+    @goal.percent_complete = params[:percent_complete]
+    @goal.end_date = params[:end_date]
+    @goal.group_id = params[:group_id]
     if @goal.save
       render json: @goal
     else
@@ -54,10 +57,6 @@ class Api::V1::GroupsController < Api::V1::BaseController
 
   def group_params
     params.require(:group).permit(:name)
-  end
-
-  def goal_params
-    params.require(:goal).permit(:percent_complete, :end_date, :start_date, :group_id)
   end
 
   def find_group
