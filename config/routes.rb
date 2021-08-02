@@ -6,14 +6,15 @@ Rails.application.routes.draw do
           resources :steps, only: [:index, :create, :show, :destroy]
         end
       end
-      resources :groups
+      resources :groups do
+        resources :goals, only: [:create]
+      end
       get 'users/:user_id/groups', to: 'groups#show_user_groups', as: 'show_user_groups'
       get '/users/:user_id/master_habits', to: 'master_habits#show_user_master_habits', as: 'show_user_master_habits'
       post '/login', to: 'login#login'
       put '/steps/:id', to: 'steps#update'
       post '/groups/:group_id/newuser', to: 'groups#add_user_to_group'
       get 'master_habits/:master_habit_id/analytics', to: 'master_habits#analytics'
-      post '/groups/:group_id/newgoal', to: 'groups#add_new_goal'
     end
   end
 end
