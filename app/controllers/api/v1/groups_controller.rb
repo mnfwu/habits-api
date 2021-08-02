@@ -41,18 +41,6 @@ class Api::V1::GroupsController < Api::V1::BaseController
     user_group.save!
   end
 
-  def add_new_goal
-    @goal = Goal.new
-    @goal.percent_complete = params[:percent_complete]
-    @goal.end_date = params[:end_date]
-    @goal.group_id = params[:group_id]
-    if @goal.save
-      render json: @goal
-    else
-      render_goal_error
-    end
-  end
-
   private
 
   def group_params
@@ -66,11 +54,6 @@ class Api::V1::GroupsController < Api::V1::BaseController
   def render_error
     render json: { errors: @group.errors.full_messages },
       status: :unprocessable_entity
-  end
-
-  def render_goal_error
-    render json: { errors: @goal.errors.full_messages },
-    status: :unprocessable_entity
   end
 
   def create_user_group(g)
