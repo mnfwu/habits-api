@@ -13,6 +13,8 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       new_frequency_logic(@master_habit)
       render json: @master_habit
     else
+      puts "hi hi hi hi #{@master_habit}"
+      puts @master_habit.errors
       render_error
     end
   end
@@ -63,7 +65,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   end
 
   def render_error
-    render json: { errors: @story.errors.full_messages },
+    render json: { errors: @master_habit.errors.full_messages },
       status: :unprocessable_entity
   end
 
