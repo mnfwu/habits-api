@@ -136,7 +136,6 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
 
   def generate_weekly_habits(m, dates)
-    p dates
     dates.each do |date|
       create_steps
       @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, 

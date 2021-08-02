@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       put '/steps/:id', to: 'steps#update'
       post '/groups/:group_id/newuser', to: 'groups#add_user_to_group'
       get 'master_habits/:master_habit_id/analytics', to: 'master_habits#analytics'
+      get '/groups/:group_id/newgoal', to: 'groups#add_new_goal'
     end
   end
 end
