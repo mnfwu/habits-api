@@ -8,3 +8,4 @@ json.master_habits do
 end
 json.groups @user.groups
 
+@date = Date.today
