@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_30_064914) do
+ActiveRecord::Schema.define(version: 2021_08_02_031741) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 2021_07_30_064914) do
     t.integer "week"
     t.boolean "missed"
     t.boolean "partially_completed"
-    t.integer "weekly_percent_complete"
+    t.integer "weekly_percent_complete", default: 0
     t.index ["master_habit_id"], name: "index_habits_on_master_habit_id"
   end
 
@@ -57,7 +57,7 @@ ActiveRecord::Schema.define(version: 2021_07_30_064914) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "user_id"
-    t.integer "percent_complete"
+    t.integer "percent_complete", default: 0
     t.index ["user_id"], name: "index_master_habits_on_user_id"
   end
 
