@@ -34,8 +34,16 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   end
 
   def show_user_master_habits
+    @user = User.find(params[:user_id])
     @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
-    @date = Date.today
+    total_completed = 0
+    total_habits = 0
+    week = Date.today.strftime('%-V')
+    @master_habits.each do |mh|
+      total_completed += mh.habits.where("completed = true").where("week = #{week}").length
+      total_habits += mh.habits.where("week = #{week}").length
+    end
+    @master_habits.length > 0 ? @user_avg = ((total_completed / total_habits.to_f) * 100).round(1) : @user_avg = "User does not have any habits yet"
   end
 
   def analytics
@@ -88,7 +96,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def delete_habits(m)
     habits = m.habits.where("due_date >= '#{Date.today}'")
     habits.destroy_all
-    m.save
+    m.save!
   end
 
   def update_frequency_logic(m)
@@ -109,35 +117,30 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 ###################### Find days and generate habits ######################
 
   def find_specific_days(m, date)
-    final_dates = []
     weekdays = {
       "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4, "Friday": 5,
       "Saturday": 6, "Sunday": 0
     }
     datesByWeekday = (date..m.end_date).group_by(&:wday)
-    m.frequency_options.each do |day|
-      final_dates += datesByWeekday[weekdays[day.to_sym]]
-    end
-    return final_dates.sort!
+    final_dates = m.frequency_options.map { |day| datesByWeekday[weekdays[day.to_sym]] }
+    return final_dates.flatten!.sort!
   end
 
   def find_times(m, date)
-    final_dates = []
     times = m.frequency_options[1].to_i
     datesByWeekday = (date..m.end_date).group_by(&:wday)
     days = [0, 6, 5, 4, 3, 2]
-    days[0..(times - 1)].each do |i|
-      final_dates += datesByWeekday[i]
-    end
-    return final_dates.sort!
+    final_dates = days[0..(times - 1)].map { |i| datesByWeekday[i] }
+    return final_dates.flatten!.sort!
   end
 
 
   def generate_weekly_habits(m, dates)
+    p dates
     dates.each do |date|
       create_steps
-        @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, 
-          frequency_options: m.frequency_options, total_steps: @steps.length, week: date.strftime('%-V'))
+      @habit = Habit.new(master_habit_id: m.id, due_date: date, name: m.name, 
+        frequency_options: m.frequency_options, total_steps: @steps.length, week: date.strftime('%-V'))
       @habit.save!
       @steps.each do |step|
         step.habit_id = @habit.id
@@ -150,24 +153,20 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     @date = date
     @frequency = (m.end_date - m.start_date).to_i + 1
     @frequency.times do
-        create_steps
-        @habit = Habit.new(master_habit_id: m.id, due_date: @date, name: m.name, 
-          frequency_options: m.frequency_options, total_steps: @steps.length, week: @date.strftime('%-V'))
-        @habit.save!
-        @steps.each do |step|
-          step.habit_id = @habit.id
-          step.save!
-        end
-        @date += 1
+      create_steps
+      @habit = Habit.new(master_habit_id: m.id, due_date: @date, name: m.name, 
+      frequency_options: m.frequency_options, total_steps: @steps.length, week: @date.strftime('%-V'))
+      @habit.save!
+      @steps.each do |step|
+        step.habit_id = @habit.id
+        step.save!
+      end
+      @date += 1
     end
   end
 
   def create_steps
-    @steps = []
-    params[:step_array].each do |step|
-      @step = Step.new(name: step["name"], completed: false, step_type: "checkbox")
-      @steps << @step
-    end
+    @steps = params[:step_array].map { |step| @step = Step.new(name: step["name"], completed: false, step_type: "checkbox") }
     return @steps
   end
 

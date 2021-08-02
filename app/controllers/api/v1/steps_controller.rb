@@ -59,10 +59,13 @@ class Api::V1::StepsController < Api::V1::BaseController
   def update_mh(h)
     master_habit = MasterHabit.find(h.master_habit_id)
     habits = Habit.where("master_habit_id = #{master_habit.id}").where("week = #{h.week}")
+    habits.each do |habit| 
+      check_habit(habit)
+      habit.save!
+    end
     completed_rate = (habits.where("completed = true").length / habits.length.to_f) * 100
     habits.each do |habit| 
       habit.weekly_percent_complete = completed_rate
-      check_habit(habit)
       habit.save!
     end
     master_habit.percent_complete = completed_rate
