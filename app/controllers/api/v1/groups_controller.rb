@@ -52,7 +52,7 @@ class Api::V1::GroupsController < Api::V1::BaseController
   end
 
   def render_error
-    render json: { errors: @story.errors.full_messages },
+    render json: { errors: @group.errors.full_messages },
       status: :unprocessable_entity
   end
 
