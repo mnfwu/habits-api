@@ -36,14 +36,6 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def show_user_master_habits
     @user = User.find(params[:user_id])
     @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
-    total_completed = 0
-    total_habits = 0
-    week = Date.today.strftime('%-V')
-    @master_habits.each do |mh|
-      total_completed += mh.habits.where("completed = true").where("week = #{week}").length
-      total_habits += mh.habits.where("week = #{week}").length
-    end
-    @master_habits.length > 0 ? @user_avg = ((total_completed / total_habits.to_f) * 100).round(1) : @user_avg = "User does not have any habits yet"
   end
 
   def analytics

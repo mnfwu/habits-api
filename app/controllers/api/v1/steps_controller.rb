@@ -19,8 +19,10 @@ class Api::V1::StepsController < Api::V1::BaseController
   def update
     if @step.update(step_params)
       @habit = Habit.find(@step.habit_id)
+      @master_habit = MasterHabit.find(@habit.master_habit_id)
       update_habit(@habit)
       update_mh(@habit)
+      update_user(@master_habit)
       render json: @step
     else
       render_error
@@ -92,5 +94,19 @@ class Api::V1::StepsController < Api::V1::BaseController
     end
     h.save!
   end
-  
+
+  def update_user(m)
+    user = User.find(m.user_id)
+    master_habits = MasterHabit.where("user_id = #{user.id}")
+    total_completed = 0
+    total_habits = 0
+    week = Date.today.strftime('%-V')
+    master_habits.each do |mh|
+      total_completed += mh.habits.where("completed = true").where("week = #{week}").length
+      total_habits += mh.habits.where("week = #{week}").length
+    end
+    user.weekly_average = ((total_completed / total_habits.to_f) * 100).round(1)
+    user.save!
+  end
+
 end
