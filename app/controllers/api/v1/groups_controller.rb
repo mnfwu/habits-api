@@ -5,7 +5,12 @@ class Api::V1::GroupsController < Api::V1::BaseController
     @groups = Group.all
   end
 
-  def show; end
+  def show
+    @users = @group.users
+    total = 0
+    @users.each { |user| total += user.weekly_average }
+    @group_average = (total / @users.length.to_f).round(1)
+  end
 
   def create
     @group = Group.new(group_params)

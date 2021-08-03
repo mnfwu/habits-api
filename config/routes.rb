@@ -7,7 +7,7 @@ Rails.application.routes.draw do
         end
       end
       resources :groups do
-        resources :goals, only: [:create]
+        resources :goals, only: [:create, :update, :destroy]
       end
       get 'users/:user_id/groups', to: 'groups#show_user_groups', as: 'show_user_groups'
       get '/users/:user_id/master_habits', to: 'master_habits#show_user_master_habits', as: 'show_user_master_habits'

@@ -1,3 +1,4 @@
 json.extract! @group, :id, :name
-json.user @group.users
+json.users @users
 json.goal @group.goals
+json.group_average @group_average
