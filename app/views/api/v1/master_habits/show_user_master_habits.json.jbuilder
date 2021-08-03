@@ -5,4 +5,9 @@ json.master_habits do
 		json.habit Habit.where("master_habit_id = #{master_habit.id}").order("due_date")
 	end
 end
-json.groups @user.groups
+json.groups do
+	json.array! @user.groups do |group|
+		json.extract! group, :id, :name
+		json.group_users group.users
+	end
+end
