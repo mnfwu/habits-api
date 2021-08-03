@@ -8,6 +8,17 @@ class Api::V1::LoginController < Api::V1::BaseController
     }
   end
 
+  def update_user
+    @user = User.find(params[:user_id])
+    @user.wechat_username = params[:wechat_username]
+    @user.wechat_pic_url = params[:wechat_pic_url]
+    if @user.save
+      render json: @user
+    else
+      render_error
+    end
+  end
+
   private
 
   URL = 'https://api.weixin.qq.com/sns/jscode2session'.freeze
@@ -25,4 +36,5 @@ class Api::V1::LoginController < Api::V1::BaseController
     # p "wechat_response: #{wechat_response}"
     JSON.parse(wechat_response.body)
   end
+
 end
