@@ -4,7 +4,8 @@ class MasterHabit < ApplicationRecord
 	validates :name, presence: true
 	validates :frequency_options, presence: true
 	validates :start_date, presence: true
-	validate :end_date_earlier_than_start_date, :start_date_earlier_than_today
+	validate :end_date_earlier_than_start_date, on: :create
+	validate :start_date_earlier_than_today, on: :create
 
 	private
 

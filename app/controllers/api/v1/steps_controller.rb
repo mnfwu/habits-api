@@ -79,6 +79,10 @@ class Api::V1::StepsController < Api::V1::BaseController
        h.completed = true
        h.partially_completed = false
        h.missed = false
+    else
+      h.completed = nil
+      h.partially_completed = nil
+      h.missed = nil
     end
     date = Date.today
     if date > h.due_date
