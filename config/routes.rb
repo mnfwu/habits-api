@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       put '/login/users/:user_id', to: 'login#update_user'
       put '/steps/:id', to: 'steps#update'
       post '/groups/:group_id/newuser', to: 'groups#add_user_to_group'
+      delete '/groups/:group_id/users/:user_id/removegroup', to: 'groups#destroy_user'
       get 'master_habits/:master_habit_id/analytics', to: 'master_habits#analytics'
     end
   end
