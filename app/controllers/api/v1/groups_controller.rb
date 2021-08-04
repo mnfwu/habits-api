@@ -46,6 +46,13 @@ class Api::V1::GroupsController < Api::V1::BaseController
     user_group.save!
   end
 
+  def destroy_user
+    @group = Group.find(params[:group_id])
+    @user = User.find(params[:user_id])
+    @usergroup = UsersGroup.find_by(user_id: @user.id, group_id: @group.id)
+    @usergroup.destroy
+  end
+
   private
 
   def group_params
