@@ -47,12 +47,17 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
     @habit_weeks.each do |week|
       week_stats = []
       week_habits = @habits.where("week = #{week}")
-      week_stats << "Week #{i}: #{week_habits.first.due_date.beginning_of_week} to #{week_habits.first.due_date.end_of_week}"
-      week_stats << (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "Percent Complete: #{week_habits.first.weekly_percent_complete || 0}%")
-      week_stats << week_habits
-      @weeks << week_stats
+      @date = Date.today
+      if week_habits.first.due_date.strftime("%B") == @date.strftime("%B")
+        week_stats << "Week #{i}: #{week_habits.first.due_date.beginning_of_week} to #{week_habits.first.due_date.end_of_week}"
+        week_stats << (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "Percent Complete: #{week_habits.first.weekly_percent_complete || 0}%")
+        week_stats << week_habits
+        week_stats << week_habits.first.weekly_percent_complete
+        @weeks << week_stats
+      end
       i += 1
     end
+    @last_four_weeks = @weeks[-4..-1]
   end
 
   private
