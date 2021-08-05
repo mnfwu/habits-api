@@ -35,7 +35,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
 
   def show_user_master_habits
     @user = User.find(params[:user_id])
-    @master_habits = MasterHabit.where("user_id = #{params[:user_id]}")
+    @master_habits = MasterHabit.where("user_id = #{params[:user_id]}").order("id")
   end
 
   def analytics
