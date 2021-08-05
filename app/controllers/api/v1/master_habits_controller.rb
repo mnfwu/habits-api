@@ -41,7 +41,6 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
   def analytics
     @habits = Habit.where("master_habit_id = #{params[:master_habit_id]}").order("due_date")
     @habit_weeks = @habits.map { |habit| habit.week }.uniq!
-    i = 1
     @weeks = []
     date = Date.today
     @habit_weeks.each do |week|
@@ -49,13 +48,13 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       week_habits = @habits.where("week = #{week}")
       @date = Date.today
       if week_habits.first.due_date.strftime("%B") == @date.strftime("%B")
-        week_stats << "Week #{i}: #{week_habits.first.due_date.beginning_of_week} to #{week_habits.first.due_date.end_of_week}"
-        week_stats << (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "Percent Complete: #{week_habits.first.weekly_percent_complete || 0}%")
+        this_week = "#{week_habits.first.due_date.beginning_of_week.strftime('%b-%d')} to #{week_habits.first.due_date.end_of_week.strftime('%b-%d')}: "
+        percent_complete = (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "#{week_habits.first.weekly_percent_complete || 0}% complete")
+        week_stats << this_week + percent_complete
         week_stats << week_habits
         week_stats << week_habits.first.weekly_percent_complete
         @weeks << week_stats
       end
-      i += 1
     end
     @last_four_weeks = @weeks[-4..-1]
   end
