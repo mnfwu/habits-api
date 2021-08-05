@@ -48,7 +48,7 @@ class Api::V1::MasterHabitsController < Api::V1::BaseController
       week_habits = @habits.where("week = #{week}")
       @date = Date.today
       if week_habits.first.due_date.strftime("%B") == @date.strftime("%B")
-        this_week = "#{week_habits.first.due_date.beginning_of_week.strftime('%b-%d')} to #{week_habits.first.due_date.end_of_week.strftime('%b-%d')}: "
+        this_week = "#{week_habits.first.due_date.beginning_of_week.strftime('%b-%d')} to #{week_habits.first.due_date.end_of_week.strftime('%b-%d')}"
         percent_complete = (date < week_habits.first.due_date.beginning_of_week ? "Not yet started" : "#{week_habits.first.weekly_percent_complete || 0}% complete")
         week_stats << this_week
         week_stats << week_habits
